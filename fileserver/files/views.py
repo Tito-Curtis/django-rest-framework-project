@@ -1,5 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from files.serializers import PersonSerializer
 from files.models import Person
 
@@ -47,3 +48,14 @@ def person(request):
         user = Person.objects.get(id=data['id'])
         user.delete()
         return Response(f"{user.name} deleted ") 
+class ApiViewExample(APIView):
+    def get(self, request):
+        return Response("This is a get method")
+    def post(self, request):
+        return Response("This is a post method")
+    def put(self, request):
+        return Response("This is a put method")
+    def patch(self, request):
+        return Response("This is a patch method")
+    def delete(self, request):
+        return Response("This is a delete method")
