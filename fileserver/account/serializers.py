@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 from django.contrib.auth.hashers import make_password
 from account.models import CustomUser
 
@@ -29,5 +30,17 @@ class SignUpSerializer(serializers.ModelSerializer):
         validated_data.pop('confirm_password',None)
         validated_data['password'] = make_password(validated_data['password'])
         user = CustomUser.objects.create(**validated_data)
+        Token.objects.create(user=user)
         return user
+    
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id','username', 'email']
 
+class CurrentUserPostSerializer(serializers.ModelSerializer):
+    post = serializers.StringRelatedField(many=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ['id','username', 'email','post']

@@ -1,10 +1,11 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status,mixins,generics,viewsets
+from rest_framework import status,mixins,generics,viewsets,permissions
 from files.serializers import PersonSerializer,PostSerializer
 from files.models import Person,Post
 from django.shortcuts import get_object_or_404
+from account.serializers import CurrentUserPostSerializer
 
 @api_view(['GET'])
 def index(request):
@@ -90,6 +91,12 @@ class PostViewSet(generics.GenericAPIView,
                   
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    def perform_create(self, serializer):
+        user = self.request.user
+        print(f"User is: {user}")
+        serializer.save(author=user)
+        
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
     def post(self,request,*args,**kwargs):
@@ -121,3 +128,12 @@ class ViewSet(viewsets.ViewSet):
 class ModelViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_user_by_post(request):
+    user = request.user
+    serializer = CurrentUserPostSerializer(instance=user)
+    return Response(serializer.data, status=status.HTTP_200_OK)

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from files.models import Person,Color, Post
+from django.contrib.auth import get_user_model
 
 
 class ColorSerializer(serializers.ModelSerializer):
@@ -26,9 +27,9 @@ class PersonSerializer(serializers.ModelSerializer):
         return data    
     
 class PostSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only= True)
-    title = serializers.CharField()
-    content = serializers.CharField() 
+
     class Meta:
         model = Post
         fields = '__all__'
+        read_only_fields = ['author', 'created_at']
+ 
